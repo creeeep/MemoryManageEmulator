@@ -1,0 +1,7 @@
+# no bin
+bin/*
+
+#no .* but .gitignore
+.*
+!.gitignore
+/bin/

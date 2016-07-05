@@ -1,4 +1,4 @@
-package com.cqu.os;
+package inter;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;

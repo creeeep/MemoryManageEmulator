@@ -1,2 +1,2 @@
 # test package
-This pacakge includes some classes for test.
+This package includes some classes for test.

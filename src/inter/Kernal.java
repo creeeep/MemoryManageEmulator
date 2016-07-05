@@ -2,6 +2,7 @@ package inter;
 
 import java.util.Properties;
 
+import jdk.internal.dynalink.beans.StaticClass;
 import tool.ConfLoader;
 import tool.ConfLoader.ConfType;
 
@@ -13,35 +14,22 @@ public class Kernal {
 	private static Kernal kernal;
 	private Kernal(){}
 	
-	private static int replacePolicy=RANDOM;
+	
 	public static int LABN=-1;
 	public static int PABN=-1;
 	
+	private int replacePolicy=-1;
 	//allcote pcb number
-	private static int PidMaxIndex=0;
-	public static int PageTableMaxIndex=0;
+	private int PidMaxIndex=0;
+	public  int PageTableMaxIndex=-1;
 	public static Kernal createNewInstance(){
 		if(kernal==null)
 			kernal=new Kernal();
-		
 		//load conf
 		Properties properties=ConfLoader.getPropertiesByConfType(ConfType.Kernal);
 		LABN=Integer.valueOf(properties.getProperty("LABN"));
 		PABN=Integer.valueOf(properties.getProperty("PABN"));
-		switch (properties.getProperty("ReplacePolicy")) {
-		case "FIFO":
-			replacePolicy=FIFO;
-			break;
-		case "LRU":
-			replacePolicy=LRU;
-			break;
-		case "RANDOM":
-			replacePolicy=RANDOM;
-			break;
-		default:
-			System.err.println("error data from ConfLoader.Kernal");
-			break;
-		}
+		kernal.replacePolicy=kernal.getReplacePolicyTag(properties.getProperty("ReplacePolicy"));
 		return kernal;
 	}
 	public static Kernal getInstance(){
@@ -52,5 +40,23 @@ public class Kernal {
 		PageTableMaxIndex++;
 		PCB pcb=new PCB(PidMaxIndex,PageTableMaxIndex);
 		return pcb;
+	}
+	public static int getReplacePolicyTag(String policyname){
+		int tag=-1;
+		switch (policyname) {
+		case "FIFO":
+			tag=FIFO;
+			break;
+		case "LRU":
+			tag=LRU;
+			break;
+		case "RANDOM":
+			tag=RANDOM;
+			break;
+		default:
+			System.err.println("error data from ConfLoader.Kernal");
+			break;
+		}
+		return tag;
 	}
 }

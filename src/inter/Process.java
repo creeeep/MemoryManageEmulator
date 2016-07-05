@@ -1,6 +1,7 @@
 package inter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 import tool.AccessTableLoader;
@@ -8,22 +9,22 @@ import tool.AccessTableLoader;
 public class Process {
 	private PCB pcb=null;
 	private ArrayList<Integer> accessTable=null;
-	private ArrayList<Float>exetimeTable=null;
-	private ArrayList<Float>waittimeTable=null;
+	private ArrayList<Float>exetimeTable=new ArrayList<>();
+	private ArrayList<Float>waittimeTable=new ArrayList<>();
 	
 	private int PC=0;
-	private long arrivetime=0;
+	private Date arrivetime=null;
 	public static final int READ=0,WRITE=1;
 	public Process(){
 		//allocate pcb through kernal
 		pcb=Kernal.getInstance().allocatePCB();
 		//getAccessTable;
 		accessTable=AccessTableLoader.loadAccessTableByPid(pcb.pid);
-		arrivetime=System.currentTimeMillis();
+	    arrivetime=new Date();
 	}
 	public boolean accessNext(){
-		long pretime=System.currentTimeMillis();
-		long watetime=pretime-arrivetime;
+		Date pretime=new Date();
+		long watetime=pretime.getTime()-arrivetime.getTime();
 		Float watetimef=new Float(watetime);
 		waittimeTable.add(PC, watetimef);
 		/*int result=MMU.getInstance().addressTranslate(pcb.ptIndex,
@@ -37,7 +38,7 @@ public class Process {
 	
 */
 		Random rantime=new Random();
-		float sleeptime=rantime.nextFloat();
+		float sleeptime=rantime.nextFloat()*5;
 		try {
 			Thread.sleep((long)sleeptime);
 		} catch (InterruptedException e) {
@@ -46,23 +47,22 @@ public class Process {
 		}
 		
 		
-		long afttime=System.currentTimeMillis();
-		long exetime=afttime-pretime;
+		Date afttime=new Date();
+		long exetime=afttime.getTime()-pretime.getTime();
 		Float exetimef=new Float(exetime);
 		exetimeTable.add(PC, exetimef);
-		print();
+		print(PC);
 		PC++;
 		
 		return true;
 	}
 
 	
-	public void print(){
-		int i;
-		for(i=0;i<PC;i++){
-			System.out.println(i+" "+accessTable.get(i)+""
+	public void print(int i){
+		int j=i+1;
+			System.out.println(j+" "+accessTable.get(i)+""
 					+ " "+"execute time="+exetimeTable.get(i)+" "+"waittime="+waittimeTable.get(i));
 			
-		}
+		
 	}
 }

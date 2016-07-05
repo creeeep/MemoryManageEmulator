@@ -1,27 +1,43 @@
-package com.cqu.os;
+package inter;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.Scanner;
+
+import com.mysql.fabric.xmlrpc.base.Array;
+
+import tool.ConfLoader;
+import tool.ConfLoader.ConfType;
 public class Disk {
 
-	private int platterCount;
-	private int trackCount;
-	private int sectorCount;
-	private String path;
+	private static int platterCount;
+	private static int trackCount;
+	private static int sectorCount;
+	
 	private Hashtable<Integer,String>dataTable;
-	public Disk() throws IOException{
-		dataTable=new Hashtable<Integer,String>();
-		loadConf();
-		platterCount=2;
-		trackCount=8;
-		sectorCount=16;
-	//	Init();
+	
+	
+	private static Disk disk;
+	private Disk(){}
+	
+	public static Disk createNewInstance(){
+		if(disk==null)
+			disk=new Disk();
+		//loadConf
+		Properties p=ConfLoader.getPropertiesByConfType(ConfType.Disk);
+		String platterCountS=p.getProperty("PlatterCount");
+		platterCount=Integer.valueOf(platterCountS);
+		trackCount=Integer.valueOf(p.getProperty("TrackCount"));
+		sectorCount=Integer.valueOf(p.getProperty("SectionCount"));
+	    return disk;
 	}
-	private void loadConf(){}
+	public static Disk getInstance(){
+		return disk;
+	}
 	private void print(int address){
 		int platter=address/(trackCount*sectorCount);
 		int track=(address/sectorCount)%trackCount;
@@ -29,34 +45,7 @@ public class Disk {
 		String imfor="data in platter:"+platter+" track:"+track+" sector:"+sector;
 		System.out.println(imfor);
 		
-	}
-	/*private void Init() throws IOException{
-		int address;
-		String data;
-		Scanner s=new Scanner( new FileReader(path));
-		while(s.hasNextLine()){
-			String line=s.nextLine();
-			Scanner si=new Scanner(line);
-			si.nextInt();
-			address=si.nextInt();
-			System.out.println(address);
-			int platter=address/(trackCount*sectorCount);
-			int track=(address/sectorCount)%trackCount;
-			int sector=address%sectorCount;
-			data="data in platter:"+platter+" track:"+track+" sector:"+sector;
-			dataTable.put(new Integer(address), data);			
-		}
-	}
-	
-	private String dataAccess(int address){
-		int platter=address/(trackCount*sectorCount);
-		int track=(address/sectorCount)%trackCount;
-		int sector=address%sectorCount;
-		String data="data in platter:"+platter+" track:"+track+" sector:"+sector;
-		dataTable.put(new Integer(address), data);
-		return data;
-	}
-	*/
+	}	
 	public String read(int address){
 		String data;
 		data=dataTable.get(new Integer(address));
@@ -64,6 +53,8 @@ public class Disk {
 		return data;
 	}
 	public boolean writeBack(int address,String newData){
+		if(dataTable==null)
+			dataTable=new Hashtable<>();
 		dataTable.remove(new Integer(address));
 		if(dataTable.put(new Integer(address), newData)!=null)
 		{
@@ -72,13 +63,4 @@ public class Disk {
 		}
 		else return false;
 	}
-	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-		Disk d=new Disk();
-		
-		d.writeBack(432, "new");
-		d.read(432);
-		
-	}
-
 }

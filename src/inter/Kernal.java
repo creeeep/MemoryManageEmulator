@@ -19,8 +19,8 @@ public class Kernal {
 	public static int PABN=-1;
 	
 	//allcote pcb number
-	private static int PidMaxIndex=-1;
-	public static int PageTableMaxIndex=-1;
+	private static int PidMaxIndex=0;
+	public static int PageTableMaxIndex=0;
 	public static Kernal createNewInstance(){
 		if(kernal==null)
 			kernal=new Kernal();
